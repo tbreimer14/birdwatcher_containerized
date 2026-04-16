@@ -16,7 +16,7 @@ class HookedResNet18(nn.Module):
         self.model = resnet18(weights=ResNet18_Weights.DEFAULT)
 
         # modify final layer for binary classification
-        # Idea: save database of actual classified birds
+        # idea: save database of actual classified birds
         # and do the binary classification later
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, 2)
@@ -29,20 +29,11 @@ class HookedResNet18(nn.Module):
         self._register_hooks()
 
     def _freeze_layers(self):
-        """
-        Freezes early layers (requires_grad = False). Only layer4 and fc
-        are updated during the interactive training, reducing compute time.
-        """
         for name, param in self.model.named_parameters():
-            if "layer3" not in name and "fc" not in name:
+            if "layer3" not in name and "layer4" not in name and "fc" not in name:
                 param.requires_grad = False
 
     def _register_hooks(self):
-        """
-        Attaches hooks to layer4 to intercept feature maps and gradients
-        during the forward and backward passes.
-        """
-
         def forward_hook(module, input, output):
             self.activations = output
 

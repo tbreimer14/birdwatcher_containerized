@@ -102,25 +102,36 @@ def train_step(model, optimizer, image_tensor, label, user_mask, lambda_weight=1
     for focusing outside the human-defined bounding box.
     """
     model.train()
+    
+    # 0. Prevent Gradient Compensation by freezing downstream layers temporarily
+    for name, param in model.named_parameters():
+        if "layer4" in name or "fc" in name:
+            param.requires_grad = False
+
     optimizer.zero_grad()
 
-    # forward pass and standard loss
+    # 1. Forward Pass & Standard Loss
     outputs = model(image_tensor)
     criterion = nn.CrossEntropyLoss()
     loss_ce = criterion(outputs, label)
 
-    # attention penalty
+    # 2. Attention Penalty Loss
     activations = model.get_activations()
     penalty_zone = 1.0 - user_mask
     penalized_activations = activations * penalty_zone
     loss_attention = torch.mean(penalized_activations)
 
-    # combined loss
+    # 3. Combined Optimization
     loss_total = loss_ce + (lambda_weight * loss_attention)
 
-    # backpropogation
+    # 4. Backpropagation
     loss_total.backward()
     optimizer.step()
+    
+    # 5. Unfreeze downstream layers for standard baseline evaluation
+    for name, param in model.named_parameters():
+        if "layer4" in name or "fc" in name:
+            param.requires_grad = True
 
     return loss_total.item(), loss_ce.item(), loss_attention.item()
 
