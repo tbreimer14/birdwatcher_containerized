@@ -11,8 +11,9 @@ class TrickWaterbirdsDataset(Dataset):
     images where the subject label conflicts with the background label.
     """
 
-    def __init__(self, split="train", data_dir="./data"):
+    def __init__(self, split="train", data_dir="./data", return_pil=True, filter=True):
         os.makedirs(data_dir, exist_ok=True)
+        self.return_pil = return_pil
 
         # load datasets and cache
         self.dataset = load_dataset(
@@ -20,9 +21,12 @@ class TrickWaterbirdsDataset(Dataset):
         )
 
         # filter for spurious correlation
-        self.filtered_data = [
-            item for item in self.dataset if item["label"] != item["place"]
-        ]
+        if filter:
+            self.filtered_data = [
+                item for item in self.dataset if item["label"] != item["place"]
+            ]
+        else:
+            self.filtered_data = list(self.dataset)
 
         # transform for the front end
         self.base_transform = transforms.Compose(
@@ -53,4 +57,6 @@ class TrickWaterbirdsDataset(Dataset):
         raw_pil_image = self.base_transform(image)
         tensor_image = self.tensor_transform(raw_pil_image)
 
-        return tensor_image, raw_pil_image, label
+        if self.return_pil:
+            return tensor_image, raw_pil_image, label
+        return tensor_image, label

@@ -102,7 +102,7 @@ def train_step(model, optimizer, image_tensor, label, user_mask, lambda_weight=1
     for focusing outside the human-defined bounding box.
     """
     model.train()
-    
+
     # 0. Prevent Gradient Compensation by freezing downstream layers temporarily
     for name, param in model.named_parameters():
         if "layer4" in name or "fc" in name:
@@ -118,8 +118,11 @@ def train_step(model, optimizer, image_tensor, label, user_mask, lambda_weight=1
     # 2. Attention Penalty Loss
     activations = model.get_activations()
     penalty_zone = 1.0 - user_mask
-    penalized_activations = activations * penalty_zone
-    loss_attention = torch.mean(penalized_activations)
+    # Calculate the relative ratio of background activations to total activations
+    penalized_sum = torch.sum(activations * penalty_zone)
+    total_sum = torch.sum(activations) + 1e-8
+
+    loss_attention = penalized_sum / total_sum
 
     # 3. Combined Optimization
     loss_total = loss_ce + (lambda_weight * loss_attention)
@@ -127,7 +130,7 @@ def train_step(model, optimizer, image_tensor, label, user_mask, lambda_weight=1
     # 4. Backpropagation
     loss_total.backward()
     optimizer.step()
-    
+
     # 5. Unfreeze downstream layers for standard baseline evaluation
     for name, param in model.named_parameters():
         if "layer4" in name or "fc" in name:
@@ -137,17 +140,20 @@ def train_step(model, optimizer, image_tensor, label, user_mask, lambda_weight=1
 
 
 def evaluate_model(model, dataset, batch_size=32):
-    """
-    Evaluates the model on a given dataset and returns accuracy.
-    Uses torch.no_grad() to skip gradient tracking and speed up computation.
-    """
+
     model.eval()
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     correct = 0
     total = 0
 
     with torch.no_grad():
-        for tensor_images, _, labels in dataloader:
+        for batch in dataloader:
+            # Handle both 2-item and 3-item tuples safely
+            if len(batch) == 3:
+                tensor_images, _, labels = batch
+            else:
+                tensor_images, labels = batch
+
             outputs = model(tensor_images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
