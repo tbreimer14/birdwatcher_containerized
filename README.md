@@ -1,4 +1,3 @@
-```markdown
 # BirdWatcher
 
 BirdWatcher is an interactive, human-in-the-loop machine learning tool designed to identify and correct spurious correlations in image classification. 
@@ -33,4 +32,3 @@ pytest
 * **`src/data_loader.py`**: Handles downloading and formatting the Waterbirds dataset, specifically filtering for out-of-distribution instances where the background and subject labels conflict.
 * **`src/utils.py`**: The core mathematical logic of the project. This includes the Grad-CAM generator, heatmap overlay functions, canvas-to-tensor masking transformations, and the custom attention-penalized training loop.
 * **`tests/`**: A comprehensive `pytest` suite ensuring the mathematical and structural stability of the application state, model freezing, and spatial mapping.
-```
