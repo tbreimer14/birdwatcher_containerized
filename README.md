@@ -22,7 +22,7 @@ streamlit run src/app.py
 **3. Run Tests (Optional)**
 To verify the integrity of the data loaders, model hooks, and utility functions, run the test suite:
 ```bash
-pytest
+python -m pytest tests/
 ```
 
 ## Project Structure

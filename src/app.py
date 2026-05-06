@@ -124,14 +124,11 @@ def render_experiment_tracker():
         st.write(f"Corrections made: {st.session_state.corrections_made}")
 
         if st.session_state.best_loss is not None:
-            st.metric(
-                "Best Total Loss", f"{st.session_state.best_loss:.3f}"
-            )
+            st.metric("Best Total Loss", f"{st.session_state.best_loss:.3f}")
 
         # 3. Post-Training Evaluation (Triggered by Loss)
         if st.session_state.best_loss is not None and (
-            st.session_state.best_loss < 0.7
-            or st.session_state.corrections_made >= 3
+            st.session_state.best_loss < 0.7 or st.session_state.corrections_made >= 3
         ):
             st.success("Target loss achieved. Ready for evaluation.")
             if st.button("Evaluate Post-Training"):
@@ -153,7 +150,9 @@ def render_experiment_tracker():
                     delta=f"{delta:.2f}%",
                 )
         elif st.session_state.best_loss is not None:
-            st.warning("Total loss is recommended to be below 0.5 to run post-training evaluation.")
+            st.warning(
+                "Total loss is recommended to be below 0.5 to run post-training evaluation."
+            )
 
 
 def main():
