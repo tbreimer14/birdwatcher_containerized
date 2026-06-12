@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 best_model_weights.pth
+data/best_model_weights.pth

@@ -21,6 +21,8 @@ from src.utils import (
     evaluate_model,
 )
 
+MODEL_WEIGHTS_PATH = "./data/best_model_weights.pth"
+
 
 def initialize_state():
     if "train_dataset" not in st.session_state:
@@ -135,7 +137,7 @@ def render_experiment_tracker():
                 with st.spinner("Loading Best Weights and Calculating Accuracy..."):
                     # Load the best saved weights into the session state model
                     st.session_state.model.load_state_dict(
-                        torch.load("best_model_weights.pth")
+                        torch.load(MODEL_WEIGHTS_PATH)
                     )
 
                     st.session_state.new_acc = evaluate_model(
@@ -234,7 +236,7 @@ def main():
                     save_msg = ""
                     if loss_tot < st.session_state.best_loss:
                         st.session_state.best_loss = loss_tot
-                        torch.save(model.state_dict(), "best_model_weights.pth")
+                        torch.save(model.state_dict(), MODEL_WEIGHTS_PATH)
                         save_msg = " | 💾 New Best Model Saved!"
 
                     st.session_state.last_loss = (

@@ -1,0 +1,11 @@
+.git
+.gitignore
+__pycache__
+.pytest_cache
+.ruff_cache
+data/
+grodino___waterbirds/
+best_model_weights.pth
+*.pth
+.env
+.env.*

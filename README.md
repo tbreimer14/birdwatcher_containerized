@@ -4,7 +4,25 @@ BirdWatcher is an interactive, human-in-the-loop machine learning tool designed 
 
 High-parameter neural networks often learn to rely on environmental backgrounds rather than actual subject features (e.g., identifying a waterbird purely because of a water background). BirdWatcher addresses this by visualizing the model's spatial activations using Grad-CAM heatmaps. Users can diagnose incorrect focus areas and use a drawing canvas to mask the true subject. The system then utilizes a custom Attention Penalty Loss and freezes specific network layers to maintain performance on CPU during a rapid fine-tuning loop, successfully forcing the model to shift its attention to the correct morphology.
 
-## Running the Project
+## Running with Docker
+
+**1. Build and start**
+```bash
+docker compose up --build
+```
+
+**2. Open the app**
+Visit [http://localhost:8501](http://localhost:8501).
+
+On the first run, the container downloads the Waterbirds dataset and ResNet18 weights. Baseline evaluation on CPU can take several minutes. Dataset cache and saved model weights are stored in a Docker volume (`birdwatcher-data` under `/app/data`).
+
+**Other commands**
+```bash
+docker compose down          # stop the container
+docker compose up --build -d # run in the background
+```
+
+## Running the Project (Local)
 
 **1. Install Dependencies**
 Ensure you have Python installed, then install the required packages:
